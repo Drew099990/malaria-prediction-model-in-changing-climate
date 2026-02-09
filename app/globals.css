@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --animate-type: type 2.7s ;
+  --animate-l: left 3s ;
+  --animate-r1:right 3s infinite ease-in-out alternate;
+  --animate-l1: leftt 3s infinite ease-in-out alternate;
+  --animate-f1 : fall 2.8s  ease-in-out;
+  --animate-f2 : fall 2.2s ease-in-out ;
+  --animate-f3 : fall 1.2s ease-in-out;
+  --animate-s : small 2s;
+  --animate-fade: fade 4s; 
+  --animate-cfade: fade 2.7s;
+  --animate-fade2: fade 5s;
+  --animate-fade3: fade 8s;
+  --animate-blink: blink 1s infinite ease-in-out;
+  --animate-movel: movel 1.8s ease-in-out;
+  --animate-mover: mover 1.8s ease-in-out;
+  
+  @keyframes blink{
+    50%{
+      content:"  | "
+    }
+  }
+  @keyframes fade {
+
+    from{
+      opacity:0;
+      transform:scale(0.7)
+    }
+    
+  }
+@keyframes fall {
+  from{
+    transform:translate(0,-1400)
+  }
+  
+}
+
+
+  @keyframes leftt{
+    from{
+      transform:translate(-40,-40)
+    }
+  }
+
+  @keyframes right{
+    from{
+      transform:translate(40,40)
+    }
+  }
+
+ @keyframes left {
+  from{
+    opacity:0.7;
+    transform:translate(-40,-40);
+    transform:scale(2.7)
+  }
+ }
+ @keyframes small {
+  from{
+    border:none;
+    opacity:0.7;
+    transform:translate(-100,-100);
+    transform:scale(0.5)
+  }
+ }
+
+  @keyframes type {
+
+    30%{
+      content:"  can help with?";
+    }
+
+    60%{
+      content:"  and its perks";
+    }
+  
+    90%{
+      content:"  and is it free?";
+    }
+  }
+
+  @keyframes movel{from{
+    transform: translate(-400,0)
+  }}
+
+  @keyframes mover{
+    from{
+    transform: translate(400,0)
+  }}
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+  --foreground: #171717;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}

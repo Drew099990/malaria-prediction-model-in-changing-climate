@@ -1,0 +1,40 @@
+{
+  "name": "studipal",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "^6.31.1",
+    "@compdfkit_pdf_sdk/webviewer": "^2.7.8",
+    "@pdftron/webviewer": "^11.6.1",
+    "@react-pdf/renderer": "^4.3.0",
+    "axios": "^1.11.0",
+    "convex": "^1.25.4",
+    "dotenv": "^17.2.1",
+    "firebase": "^12.1.0",
+    "next": "15.4.5",
+    "next-auth": "^4.24.11",
+    "openai": "^5.12.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-firebase-hooks": "^5.1.1",
+    "react-icons": "^5.5.0",
+    "react-pdf": "^10.0.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.5",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

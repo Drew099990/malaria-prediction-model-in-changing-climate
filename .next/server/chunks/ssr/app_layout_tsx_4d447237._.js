@@ -1,0 +1,12 @@
+module.exports = {
+
+"[project]/app/layout.tsx [app-rsc] (ecmascript)": ((__turbopack_context__) => {
+
+var { m: module, e: exports } = __turbopack_context__;
+{
+const e = new Error("Could not parse module '[project]/app/layout.tsx'\n\nExpected '</', got 'jsx text (\n            )'");
+e.code = 'MODULE_UNPARSABLE';
+throw e;
+}}),
+
+};

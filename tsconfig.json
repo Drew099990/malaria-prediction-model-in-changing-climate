@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(nav)/study/page.jsx", "app/(nav)/career/page.jsx", "app/(nav)/saved-notes/page.tsx", "app/components/pdfreader.jsx", "studipal/app/server/inner.tsx", "studipal/app/server/page.jsx", "app/(nav)/login/page.jsx", "app/(nav)/signup/page.jsx"],
+  "exclude": ["node_modules"]
+}
