@@ -472,6 +472,25 @@ function ForcastPage() {
                                                     fileName: "[project]/app/(nav)/forcast/page.tsx",
                                                     lineNumber: 210,
                                                     columnNumber: 19
+                                                }, this),
+                                                typeof prediction.predicted_cases === 'number' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "mt-2 text-sm text-black/70",
+                                                    children: [
+                                                        "Estimated cases: ",
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "font-bold text-black/90",
+                                                            children: prediction.predicted_cases
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/(nav)/forcast/page.tsx",
+                                                            lineNumber: 214,
+                                                            columnNumber: 82
+                                                        }, this),
+                                                        " patients"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/(nav)/forcast/page.tsx",
+                                                    lineNumber: 214,
+                                                    columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
@@ -490,7 +509,7 @@ function ForcastPage() {
                                                             children: "Risk Level:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                            lineNumber: 217,
+                                                            lineNumber: 220,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -498,13 +517,13 @@ function ForcastPage() {
                                                             children: prediction.risk_level
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                            lineNumber: 218,
+                                                            lineNumber: 221,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                    lineNumber: 216,
+                                                    lineNumber: 219,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -515,13 +534,13 @@ function ForcastPage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                    lineNumber: 233,
+                                                    lineNumber: 236,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                            lineNumber: 215,
+                                            lineNumber: 218,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -532,7 +551,7 @@ function ForcastPage() {
                                                     children: "Public Health Recommendation"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                    lineNumber: 239,
+                                                    lineNumber: 242,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -540,13 +559,13 @@ function ForcastPage() {
                                                     children: prediction.recommendation
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                    lineNumber: 240,
+                                                    lineNumber: 243,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                            lineNumber: 238,
+                                            lineNumber: 241,
                                             columnNumber: 17
                                         }, this)
                                     ]
@@ -563,7 +582,7 @@ function ForcastPage() {
                                             children: "Risk Level Interpretation"
                                         }, void 0, false, {
                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                            lineNumber: 249,
+                                            lineNumber: 252,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -577,20 +596,20 @@ function ForcastPage() {
                                                             children: "0-20%:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                            lineNumber: 252,
+                                                            lineNumber: 255,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Low risk — maintain prevention measures."
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                            lineNumber: 253,
+                                                            lineNumber: 256,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                    lineNumber: 251,
+                                                    lineNumber: 254,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -601,20 +620,20 @@ function ForcastPage() {
                                                             children: "21-50%:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                            lineNumber: 256,
+                                                            lineNumber: 259,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Moderate risk — increase surveillance and vector control."
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                            lineNumber: 257,
+                                                            lineNumber: 260,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                    lineNumber: 255,
+                                                    lineNumber: 258,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -625,20 +644,20 @@ function ForcastPage() {
                                                             children: "51-80%:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                            lineNumber: 260,
+                                                            lineNumber: 263,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "High risk — prioritize testing, treatment availability and community measures."
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                            lineNumber: 261,
+                                                            lineNumber: 264,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                    lineNumber: 259,
+                                                    lineNumber: 262,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -649,32 +668,32 @@ function ForcastPage() {
                                                             children: "81-100%:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                            lineNumber: 264,
+                                                            lineNumber: 267,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Very high risk — urgent public health response recommended."
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                            lineNumber: 265,
+                                                            lineNumber: 268,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                                    lineNumber: 263,
+                                                    lineNumber: 266,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                            lineNumber: 250,
+                                            lineNumber: 253,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/(nav)/forcast/page.tsx",
-                                    lineNumber: 248,
+                                    lineNumber: 251,
                                     columnNumber: 15
                                 }, this)
                             ]

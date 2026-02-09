@@ -210,6 +210,9 @@ export default function ForcastPage() {
                   <div className="mt-2 text-5xl font-extrabold text-blue-600">
                     {prediction.probability.toFixed(1)}%
                   </div>
+                  {typeof prediction.predicted_cases === 'number' && (
+                    <div className="mt-2 text-sm text-black/70">Estimated cases: <span className="font-bold text-black/90">{prediction.predicted_cases}</span> patients</div>
+                  )}
                 </div>
 
                 <div className="pt-4 border-t border-blue-200">

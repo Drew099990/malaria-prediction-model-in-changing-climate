@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 from pathlib import Path
+import pickle
 
 class MalariaPredictor(nn.Module):
     """
@@ -72,10 +73,24 @@ def create_and_save_model(model_path="malaria_model.pth"):
 
 
 def load_model(model_path="malaria_model.pth"):
-    """Load the malaria prediction model."""
-    model = MalariaPredictor()
-    if Path(model_path).exists():
-        model.load_state_dict(torch.load(model_path, weights_only=True))
+    """Load the malaria prediction model, inferring architecture from checkpoint."""
+    ckpt_path = Path(model_path)
+    if ckpt_path.exists():
+        ckpt = torch.load(str(ckpt_path))
+        # Infer input_size and hidden_size from checkpoint parameter shapes
+        # fc1.weight shape: (hidden_size, input_size)
+        if 'fc1.weight' in ckpt:
+            hidden_size = ckpt['fc1.weight'].shape[0]
+            input_size = ckpt['fc1.weight'].shape[1]
+        else:
+            # Fallback to defaults
+            input_size = 7
+            hidden_size = 64
+        model = MalariaPredictor(input_size=int(input_size), hidden_size=int(hidden_size))
+        model.load_state_dict(ckpt)
+    else:
+        # No checkpoint: instantiate default model
+        model = MalariaPredictor()
     model.eval()
     return model
 
@@ -139,6 +154,22 @@ def predict_malaria_risk(temperature, rainfall, humidity, breeding_count, previo
     with torch.no_grad():
         output = model(input_tensor)
         probability = float(output.item()) * 100  # Convert to 0-100%
+
+    # Attempt to load scaler metadata to recover max_cases for absolute prediction
+    max_cases = None
+    try:
+        meta_path = Path(__file__).parent / 'scaler.pkl'
+        if meta_path.exists():
+            with open(meta_path, 'rb') as f:
+                meta = pickle.load(f)
+                max_cases = meta.get('max_cases', None)
+    except Exception:
+        max_cases = None
+
+    predicted_cases = None
+    if max_cases is not None:
+        # Convert model output (0-1 scaled by max_cases during training) back to absolute count
+        predicted_cases = int(round((probability / 100.0) * float(max_cases)))
     
     # Determine risk level
     if probability < 20:
@@ -158,7 +189,9 @@ def predict_malaria_risk(temperature, rainfall, humidity, breeding_count, previo
         "probability": round(probability, 2),
         "risk_level": risk_level,
         "recommendation": recommendation,
-        "model_confidence": "High" if (probability < 20 or probability > 80) else "Moderate"
+        "model_confidence": "High" if (probability < 20 or probability > 80) else "Moderate",
+        "predicted_cases": predicted_cases,
+        "max_cases_reference": max_cases,
     }
 
 
