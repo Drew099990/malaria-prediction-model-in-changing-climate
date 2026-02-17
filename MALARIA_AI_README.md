@@ -15,6 +15,10 @@ A full-stack AI system combining PyTorch deep learning with a Next.js frontend f
 - Node.js 16+
 - Virtual environment (recommended)
 
+Additional Python packages required for spreadsheet support:
+`pandas` and an Excel engine such as `openpyxl` (for `.xlsx` files).
+You can install them with `pip install pandas openpyxl`.
+
 ## Installation & Setup
 
 ### 1. Install Python Dependencies
@@ -28,7 +32,7 @@ python -m venv .venv
 .venv\Scripts\activate
 
 # Install required packages
-pip install torch fastapi uvicorn pydantic
+pip install torch fastapi uvicorn pydantic pandas openpyxl
 ```
 
 **Note:** If torch installation fails on Windows, try:
@@ -72,44 +76,39 @@ The app will be available at `http://localhost:3000`
 
 ## Usage
 
-1. Go to the **Forecast** page
-2. Enter climate data:
-   - **Temperature** (°C): Current average temperature
-   - **Rainfall** (mm): Monthly precipitation
-   - **Humidity** (%): Relative humidity
-   - **Breeding Site Count**: Number of nearby mosquito breeding sites
-   - **Previous Cases**: Cases from last month
-   - **Irrigation**: Checkbox for standing water nearby
-   - **Season**: Select rainy, dry, or transition
-3. Click **"Compute Probability"**
-4. View AI predictions with:
-   - Outbreak probability percentage
+1. Go to the **Forecast** page in the frontend.
+2. Provide the following inputs:
+   - **Temperature** (°C)
+   - **Humidity** (%)
+   - **Rainy Days** (count for the current month)
+   - **Previous Cases** (number of malaria cases reported last month)
+3. Click **"Compute Probability"**.
+4. The page will display:
+   - Estimated outbreak probability (%)
+   - Estimated case count (derived from the model and scaler)
    - Risk level (Low/Moderate/High/Very High)
-   - Public health recommendations
-   - Model confidence level
+   - Public health recommendation and model confidence
 
 ## Model Details
 
-### Input Features (7 total)
+The neural network is trained on four input features:
 
-| Feature | Range | Normalization |
-|---------|-------|----------------|
-| Temperature | 15-35°C | (T-15)/20 |
-| Rainfall | 0-500 mm | min(R/500, 1.0) |
-| Humidity | 30-90% | (H-30)/60 |
-| Breeding Count | 0-20 sites | min(B/20, 1.0) |
-| Previous Cases | 0-100 cases | min(C/100, 1.0) |
-| Irrigation | 0 or 1 | 0/1 |
-| Season | rainy/dry/transition | 1.0/0.0/0.5 |
+| Feature | Description |
+|---------|-------------|
+| Temperature | Average local temperature (°C) |
+| Humidity | Relative humidity (%) |
+| Rainy Days | Number of rainy days in the current month |
+| Previous Cases | Reported malaria cases in the previous month |
+
+The target is normalized outbreak probability; a `StandardScaler` is saved along
+with the model so inputs are scaled consistently during inference.
 
 ### Output
 
-- **Probability**: 0-100% outbreak likelihood
-- **Risk Level**: 
-  - Low (0-20%)
-  - Moderate (21-50%)
-  - High (51-80%)
-  - Very High (81-100%)
+The model returns a probability (0–100%) which is then mapped to:
+- An estimated case count (using `max_cases` from training data)
+- A risk level: Low, Moderate, High or Very High
+- A public‑health recommendation and confidence tag
 
 ### Neural Network Architecture
 
@@ -146,39 +145,33 @@ malaria-shpher/
 
 ## API Endpoints
 
+
+
+## API Endpoints
+
 ### POST /api/predict-malaria
 **FastAPI Backend Endpoint**
 
-Request:
+Accepts a JSON payload with the four input features:
 ```json
 {
   "temperature": 28,
-  "rainfall": 250,
   "humidity": 75,
-  "breedingCount": 5,
-  "previousCases": 10,
-  "irrigation": true,
-  "season": "rainy"
+  "rainy_days": 20,
+  "previous_cases": 10
 }
 ```
 
-Response:
-```json
-{
-  "probability": 68.45,
-  "risk_level": "High",
-  "recommendation": "Prioritize testing, treatment availability, and intensify community control measures.",
-  "model_confidence": "High"
-}
-```
+The response mirrors the data shown on the forecast page and includes the
+probability, predicted case count, risk level, recommendation, and confidence.
 
 ### POST /api/predict
 **Next.js Proxy Endpoint**
 
-Same request/response format as above. Use this from the frontend.
+Used by the frontend; forwards the same JSON format to the backend.
 
 ### GET /api/health
-Health check endpoint for FastAPI backend.
+Simple health check returning `{ "status": "ok" }`.
 
 ## Troubleshooting
 

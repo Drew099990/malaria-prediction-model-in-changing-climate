@@ -5,20 +5,19 @@ import React, { useState } from "react";
 export default function ForcastPage() {
 
   const [temperature, setTemperature] = useState<number | "">("");
-  const [rainfall, setRainfall] = useState<number | "">("");
   const [humidity, setHumidity] = useState<number | "">("");
-  const [breedingCount, setBreedingCount] = useState<number | "">("");
+  const [rainyDays, setRainyDays] = useState<number | "">("");
   const [previousCases, setPreviousCases] = useState<number | "">("");
-  const [irrigation, setIrrigation] = useState(false);
-  const [season, setSeason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [prediction, setPrediction] = useState<{
     probability: number;
     risk_level: string;
     recommendation: string;
     model_confidence: string;
+    predicted_cases?: number;
   } | null>(null);
   const [error, setError] = useState<string>("");
+
 
   async function submit(e?: React.FormEvent) {
     if (e) e.preventDefault();
@@ -30,12 +29,9 @@ export default function ForcastPage() {
     try {
       const payload = {
         temperature: temperature === "" ? null : temperature,
-        rainfall: rainfall === "" ? null : rainfall,
         humidity: humidity === "" ? null : humidity,
-        breedingCount: breedingCount === "" ? null : breedingCount,
-        previousCases: previousCases === "" ? null : previousCases,
-        irrigation,
-        season: season || "",
+        rainy_days: rainyDays === "" ? null : rainyDays,
+        previous_cases: previousCases === "" ? null : previousCases,
       };
 
       const response = await fetch("/api/predict", {
@@ -59,14 +55,12 @@ export default function ForcastPage() {
     }
   }
 
+  // reset form inputs
   function reset() {
     setTemperature("");
-    setRainfall("");
     setHumidity("");
-    setBreedingCount("");
+    setRainyDays("");
     setPreviousCases("");
-    setIrrigation(false);
-    setSeason("");
     setPrediction(null);
     setError("");
   }
@@ -95,12 +89,12 @@ export default function ForcastPage() {
             </label>
 
             <label className="block mb-3">
-              <div className="text-sm text-black/80">Monthly Rainfall (mm)</div>
+              <div className="text-sm text-black/80">Number of Rainy Days</div>
               <input
                 type="number"
                 className="mt-1 w-full p-2 rounded border"
-                value={rainfall}
-                onChange={(e) => setRainfall(e.target.value === "" ? "" : Number(e.target.value))}
+                value={rainyDays}
+                onChange={(e) => setRainyDays(e.target.value === "" ? "" : Number(e.target.value))}
               />
             </label>
 
@@ -115,17 +109,7 @@ export default function ForcastPage() {
             </label>
 
             <label className="block mb-3">
-              <div className="text-sm text-black/80">Nearby Breeding Site Count</div>
-              <input
-                type="number"
-                className="mt-1 w-full p-2 rounded border"
-                value={breedingCount}
-                onChange={(e) => setBreedingCount(e.target.value === "" ? "" : Number(e.target.value))}
-              />
-            </label>
-
-            <label className="block mb-3">
-              <div className="text-sm text-black/80">Previous Cases (last month)</div>
+              <div className="text-sm text-black/80">Previous Month's Cases</div>
               <input
                 type="number"
                 className="mt-1 w-full p-2 rounded border"
@@ -134,29 +118,6 @@ export default function ForcastPage() {
               />
             </label>
 
-            <label className="flex items-center gap-3 mb-3">
-              <input
-                type="checkbox"
-                className="h-4 w-4"
-                checked={irrigation}
-                onChange={(e) => setIrrigation(e.target.checked)}
-              />
-              <span className="text-black/80">Irrigation or standing water nearby</span>
-            </label>
-
-            <label className="block mb-3">
-              <div className="text-sm text-black/80">Season</div>
-              <select
-                className="mt-1 w-full p-2 rounded border"
-                value={season}
-                onChange={(e) => setSeason(e.target.value)}
-              >
-                <option value="">Select season</option>
-                <option value="rainy">Rainy</option>
-                <option value="dry">Dry</option>
-                <option value="transition">Transition</option>
-              </select>
-            </label>
 
             <div className="flex gap-3 mt-4">
               <button

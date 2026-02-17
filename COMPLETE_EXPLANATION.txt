@@ -1,0 +1,215 @@
+Malaria Prediction System — Complete Explanation
+
+Purpose
+-------
+This document fully explains how the malaria prediction system works end-to-end. It describes the components, data flow, model, preprocessing, training, API, frontend integration, how predictions are computed (including absolute case estimates), how to run and re-train the model, troubleshooting, and next steps.
+
+High-level overview
+-------------------
+- Frontend: Next.js React app provides a form (Forecast page) where users enter climate and environmental inputs.
+- Proxy: A Next.js API route (`/api/predict`) forwards user input to the FastAPI backend.
+- Backend: FastAPI (`app/backend.py`) loads a PyTorch model and runs inference via a `/api/predict-malaria` endpoint.
+- Model: PyTorch neural network (`malaria_model.py`) trained on `data.xlsx` and saved as `malaria_model.pth`. A `scaler.pkl` is used to recover training normalization metadata.
+- Output: Backend returns a JSON payload with predicted outbreak probability (0–100%), categorical risk level, public-health recommendation, model confidence, and an estimated absolute number of cases for the month when available.
+
+Files of interest (paths relative to project root)
+------------------------------------------------
+- `malaria_model.py` — Model class (`MalariaPredictor`), preprocessing helper, `predict_malaria_risk()` and load/save helpers.
+- `malaria_model.pth` — Saved model weights produced by `train.py` or `malaria_model.create_and_save_model()`.
+- `scaler.pkl` — Pickled metadata created by the training script. Contains StandardScaler plus `max_cases` used to scale target values. Necessary to compute absolute case estimates.
+- `train.py` — Training script: reads `data.xlsx`, preprocesses, trains the model, saves `malaria_model.pth` and `scaler.pkl`.
+- `app/backend.py` — FastAPI app. Loads model on startup, exposes `/api/predict-malaria` and `/api/health`.
+- `app/api/predict/route.ts` — Next.js proxy route that forwards requests to the FastAPI backend.
+- `app/(nav)/forcast/page.tsx` — React Forecast page. Collects inputs, posts to `/api/predict`, displays probability, risk level, recommendation and estimated cases.
+- `data.xlsx` — Local example dataset used to train the model (monthly data).
+- `train.py` — Training pipeline that creates `malaria_model.pth` and `scaler.pkl`.
+
+Inputs (from frontend form)
+---------------------------
+The form collects these values:
+- `temperature`: average monthly temperature in °C (number)
+- `rainfall`: monthly rainfall in mm (number)
+- `humidity`: relative humidity in % (number)
+- `breedingCount`: nearby breeding site count (number)
+- `previousCases`: reported cases in previous month (number)
+- `irrigation`: boolean (checkbox indicating standing water/irrigation)
+- `season`: one of `rainy`, `dry`, `transition`
+
+Data preprocessing (training and inference)
+-------------------------------------------
+The training script and inference pipeline normalize and prepare inputs similarly so inference sees the same scaled features used for training.
+
+Feature normalization used by `train.py`:
+- `temperature` normalized by (T - 15) / 20 (maps 15–35°C → ~0–1)
+- `rainfall` normalized by min(R/500, 1.0)
+- `humidity` normalized by (H - 30) / 60 (maps 30–90% → ~0–1)
+- `breedingCount` normalized by min(B / 20, 1.0)
+- `previousCases` normalized by min(prev / 100, 1.0)
+- `irrigation` → 0 or 1
+- `season` encoded as rainy=1.0, transition=0.5, dry=0.0
+
+Additionally, `train.py` fits a `StandardScaler` on the assembled features and saves it in `scaler.pkl` alongside `max_cases` (the maximum historical case count used to scale the target). The scaler and `max_cases` are used at inference time to recover absolute predicted case counts.
+
+Model architecture
+------------------
+`MalariaPredictor` (PyTorch) architecture used in this project:
+- Input layer: size = 7 (number of features)
+- FC1: input_size → hidden_size (default hidden_size=64)
+- ReLU, Dropout(0.3)
+- FC2: hidden_size → hidden_size
+- ReLU, Dropout(0.3)
+- FC3: hidden_size → 32
+- ReLU, Dropout(0.2)
+- FC4: 32 → 1
+- Sigmoid activation on final output
+
+The model outputs a single value in range 0–1. During training, the target (monthly case count) was scaled by dividing by `max_cases` to map it into roughly 0–1 for regression. At inference, the output is multiplied by 100 for a percentage-like probability display and can be multiplied by `max_cases` to recover an estimated absolute case count.
+
+Training pipeline (`train.py`) overview
+--------------------------------------
+1. Load `data.xlsx` and locate columns for monthly case counts and climate features.
+2. Create derived features such as `previousCases` (lag of the case column) and `season` derived from rainy days.
+3. Map `season` to numeric values and assemble the feature matrix.
+4. Scale features using `StandardScaler()` and save the fitted scaler (with `max_cases`) into `scaler.pkl`.
+5. Scale target values by dividing by `max_cases` to create `y` in range 0–1.
+6. Train the PyTorch model using MSELoss and Adam optimizer with early stopping.
+7. Save the model weights to `malaria_model.pth` when validation loss improves.
+8. At the end, the script evaluates the model and prints MSE and R² on the training data.
+
+How predictions are computed at runtime
+--------------------------------------
+1. Frontend sends JSON input to Next.js route `/api/predict`.
+2. Next.js route forwards the JSON to FastAPI `/api/predict-malaria`.
+3. FastAPI receives the request and passes values to `predict_malaria_risk()` in `malaria_model.py`.
+4. `predict_malaria_risk()` normalizes inputs using the same formula used during training (and optionally the saved `StandardScaler`), builds the input tensor, and performs a forward pass through the loaded PyTorch model.
+5. Output is a scalar in 0–1. The code multiplies that by 100 to present a probability-like value in percent.
+6. If `scaler.pkl` with `max_cases` is present, the script calculates `predicted_cases = round(output * max_cases)` to estimate absolute patient count for the month. The JSON response includes `probability`, `risk_level`, `recommendation`, `model_confidence`, and `predicted_cases` (when `max_cases` is available).
+
+API endpoints
+-------------
+- `GET /api/health` (FastAPI) — returns simple `{status: 'ok', message: 'Malaria prediction API is running'}`. Useful for health checks.
+- `POST /api/predict-malaria` (FastAPI) — main prediction endpoint. Input schema (Pydantic) mirrors the frontend fields. Returns JSON with probability and other metadata.
+- `POST /api/predict` (Next.js route) — proxy endpoint that forwards to FastAPI. Frontend calls this route.
+
+Frontend behavior (`page.tsx`)
+-----------------------------
+- The Forecast page uses React `useState` hooks to hold all input values.
+- On clicking "Compute Probability" the form packages the values into JSON and posts to `/api/predict`.
+- The page shows a loading spinner while awaiting the response, disables buttons, and handles errors.
+- On success the page displays:
+  - a large percentage value (`probability`)
+  - a color-coded `risk_level` badge (Low/Moderate/High/Very High)
+  - `recommendation` text
+  - `model_confidence`
+  - `predicted_cases` (if returned) displayed as "Estimated cases: X patients"
+
+How absolute estimated cases are derived
+---------------------------------------
+- During training, the model learned to predict the scaled target `y = cases / max_cases`.
+- `max_cases` is saved into `scaler.pkl` by the training script.
+- At inference, the model output (0–1) is multiplied by `max_cases` and rounded to an integer to provide an estimate of the number of cases expected for the month.
+- Note: This estimate is only as good as the training data: if the training set is small or not representative, the absolute case estimate can be unreliable. Use the `model_confidence` and validation metrics to judge reliability.
+
+Model confidence and interpretation
+----------------------------------
+- The API returns `model_confidence` as a simple heuristic: "High" for extreme probabilities (<20% or >80%) and "Moderate" otherwise. This is a lightweight indicator, not a rigorous statistical confidence interval.
+- For rigorous uncertainty estimates, consider adding ensemble models, Monte Carlo dropout, or Bayesian methods to provide predictive intervals.
+
+How to run the system (local development)
+-----------------------------------------
+1. Activate virtual environment and install Python deps (inside project root):
+
+```powershell
+.venv\Scripts\activate
+pip install -r requirements.txt
+# or install manually
+pip install torch fastapi uvicorn pandas openpyxl scikit-learn
+```
+
+2. (Optional) Train or re-train the model:
+
+```powershell
+.venv\Scripts\python.exe train.py
+```
+
+This creates `malaria_model.pth` and `scaler.pkl`.
+
+3. Start the FastAPI backend:
+
+```powershell
+.venv\Scripts\uvicorn.exe app.backend:app --reload --port 8000
+```
+
+4. Start the Next.js frontend (in separate terminal):
+
+```powershell
+npm run dev
+# or from project root: pnpm dev / yarn dev depending on your setup
+```
+
+5. Open browser at `http://localhost:3000` and navigate to the Forecast page.
+
+Testing endpoints manually
+--------------------------
+- Health check:
+
+```bash
+curl http://127.0.0.1:8000/api/health
+```
+
+- Prediction (direct to backend):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/predict-malaria \
+  -H "Content-Type: application/json" \
+  -d '{"temperature":28,"rainfall":250,"humidity":75,"breedingCount":5,"previousCases":10,"irrigation":true,"season":"rainy"}'
+```
+
+Training recommendations
+------------------------
+- Use more training data covering multiple regions, seasons and years for better generalization.
+- Add features such as: vegetation index, population density, elevation, water body proximity, and local vector control measures.
+- Perform k-fold cross-validation and track RMSE, MAE, R² for regression on absolute cases and for classification on risk buckets.
+- Consider scaling and transforming skewed features, or using target transformations (e.g., log) if case counts are highly skewed.
+- Save model metadata (training date, dataset path, hyperparameters) for reproducibility.
+
+Troubleshooting
+---------------
+- "ModuleNotFoundError: No module named 'torch'": ensure venv active and install PyTorch (use CPU wheels for Windows).
+- CORS errors: FastAPI includes CORS middleware configured for local development; adjust `allow_origins` in `app/backend.py` for deployment.
+- `malaria_model.pth` size mismatch: recreate model by running `train.py` or ensure `malaria_model.py` `load_model()` infers architecture from checkpoint.
+- `predicted_cases` is null: ensure `scaler.pkl` exists in the project root; it must include `max_cases` saved by `train.py`.
+
+Security, privacy, and ethics
+-----------------------------
+- Patient counts and predictions can influence public health decisions — ensure model performance is validated before operational use.
+- Protect any real patient or location-specific data; do not expose personally identifiable information (PII).
+- Provide disclaimers in the UI: predictions are heuristic and must complement epidemiological surveillance, not replace it.
+- Consider access controls for prediction endpoints in production (authentication, rate limiting).
+
+Deployment notes
+----------------
+- Containerize the FastAPI app (Docker) and the model assets (`malaria_model.pth`, `scaler.pkl`) for reproducible deployment.
+- Use GPU instances if running a more complex model or serving higher throughput.
+- For production, consider running multiple FastAPI worker processes behind a reverse proxy (NGINX) or use an autoscaling platform.
+
+Extensions and next improvements
+-------------------------------
+- Add uncertainty quantification (ensembles, Monte Carlo dropout, Bayesian NN) to produce prediction intervals.
+- Add a time-series forecasting model to predict upcoming months using past months as input features.
+- Make training incremental: accept new uploaded datasets and retrain or fine-tune the model.
+- Add visualization: time-series charts, heatmaps, and historic predictions on the Forecast page.
+- Add logging and experiment tracking (MLFlow, Weights & Biases) for model versions and metrics.
+
+Contact and version info
+------------------------
+- Model and code created on: February 9, 2026 (local project snapshot)
+- Project root contains many documentation files: `QUICK_START.md`, `MALARIA_AI_README.md`, `IMPLEMENTATION_SUMMARY.md`, `ARCHITECTURE.md`, `README_AI_SYSTEM.md`, `INDEX.md`
+
+If you want, I can:
+- Convert this text into a markdown file and link it in the repo README
+- Add diagrams or plots explaining model behavior
+- Add a small endpoint that returns the `scaler.pkl` metadata for audit
+- Format and display `predicted_cases` with commas and add a tooltip on the Forecast page explaining how it is calculated
+
+End of explanation.

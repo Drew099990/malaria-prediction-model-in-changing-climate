@@ -34,12 +34,9 @@ async def startup_event():
 # Define input schema for malaria prediction
 class MalariaInput(BaseModel):
     temperature: float = None  # °C
-    rainfall: float = None  # mm
     humidity: float = None  # %
-    breedingCount: int = None
-    previousCases: int = None
-    irrigation: bool = False
-    season: str = ""
+    rainy_days: int = None
+    previous_cases: int = None  # cases last month
 
 
 @app.post("/api/predict-malaria")
@@ -54,30 +51,21 @@ async def predict_malaria(input_data: MalariaInput):
         - model_confidence: High or Moderate
     """
     try:
-        # Handle None values with defaults
         temperature = input_data.temperature or 25
-        rainfall = input_data.rainfall or 0
         humidity = input_data.humidity or 50
-        breeding_count = input_data.breedingCount or 0
-        previous_cases = input_data.previousCases or 0
-        irrigation = input_data.irrigation or False
-        season = input_data.season or ""
-        
-        # Get prediction from model
+        rainy = input_data.rainy_days or 0
+        prev = input_data.previous_cases or 0
         result = predict_malaria_risk(
             temperature=temperature,
-            rainfall=rainfall,
             humidity=humidity,
-            breeding_count=breeding_count,
-            previous_cases=previous_cases,
-            irrigation=irrigation,
-            season=season
+            rainy_days=rainy,
+            previous_cases=prev,
         )
-        
         return result
-        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
+
+
 
 
 @app.get("/api/health")

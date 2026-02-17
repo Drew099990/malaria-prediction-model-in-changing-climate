@@ -13,75 +13,49 @@ p = Path('data.xlsx')
 if not p.exists():
     raise FileNotFoundError('data.xlsx not found')
 
+# load climate data from spreadsheet and select relevant columns
+# assume file has columns 'avg temp', 'humidity (%)', 'rainy days', and
+# 'sick of malaria' for the target.
 df = pd.read_excel(p, header=1)
-# Clean column names
-cols = [c.strip() for c in df.columns.tolist()]
-df.columns = cols
-
-# Rename columns to predictable names
-# Expected columns found in the file
-# ['month','sick of malaria','min temp','avg temp','max temp','humidity (%)','rainy days','precipitaion (mm)']
-expected = ['month','sick of malaria','min temp','avg temp','max temp','humidity (%)','rainy days','precipitaion (mm)']
-# Trim any leading spaces in precip column
-if 'precipitaion (mm)' not in df.columns and ' precipitaion (mm)' in df.columns:
-    df = df.rename(columns={' precipitaion (mm)': 'precipitaion (mm)'})
-
-# Drop rows with all NaNs
+# drop rows with no data
 df = df.dropna(how='all')
-# Convert numeric columns
-num_cols = ['sick of malaria','min temp','avg temp','max temp','humidity (%)','rainy days','precipitaion (mm)']
-for c in num_cols:
-    df[c] = pd.to_numeric(df[c], errors='coerce')
 
-# Fill any remaining NaNs with column median
-for c in num_cols:
-    if df[c].isna().any():
-        df[c] = df[c].fillna(df[c].median())
+if 'sick of malaria' not in df.columns:
+    raise ValueError("Spreadsheet must contain 'sick of malaria' column")
 
-# Create previousCases as lag of 'sick of malaria'
-df['previousCases'] = df['sick of malaria'].shift(1).fillna(0)
-# irrigation default 0
-df['irrigation'] = 0
-
-# Encode season from rainy days
-# rainy days >5 => rainy, 1-5 -> transition, 0 -> dry
-def season_from_rainy(days):
-    if days > 5:
-        return 'rainy'
-    if days > 0:
-        return 'transition'
-    return 'dry'
-
-df['season'] = df['rainy days'].apply(season_from_rainy)
-
-# Build feature matrix to match frontend/backend inputs:
-# temperature (avg temp), rainfall (precipitaion (mm)), humidity (%),
-# breedingCount (rainy days), previousCases, irrigation, season
+# derive feature matrix with climate inputs and previous cases
+# note: dataset does not contain an explicit previous-month column, so we
+# create it by shifting the target values (lag-1). users supplying live
+# values to the API will provide their own previousCases number.
 X = pd.DataFrame({
-    'temperature': df['avg temp'],
-    'rainfall': df['precipitaion (mm)'],
-    'humidity': df['humidity (%)'],
-    'breedingCount': df['rainy days'],
-    'previousCases': df['previousCases'],
-    'irrigation': df['irrigation'],
-    'season': df['season']
+    'temperature': pd.to_numeric(df.get('avg temp'), errors='coerce'),
+    'humidity': pd.to_numeric(df.get('humidity (%)'), errors='coerce'),
+    'rainy_days': pd.to_numeric(df.get('rainy days'), errors='coerce'),
 })
+# placeholder for previous cases created later once y_raw is known
 
-# Encode season to numeric: rainy=1.0, transition=0.5, dry=0.0
-season_map = {'rainy': 1.0, 'transition': 0.5, 'dry': 0.0}
-X['season'] = X['season'].map(season_map).fillna(0.0)
+# fill missing climate values with column median
+for c in ['temperature','humidity','rainy_days']:
+    if X[c].isna().any():
+        X[c] = X[c].fillna(X[c].median())
 
-# Target: normalize sick of malaria to 0-1 by dividing by max
-y_raw = df['sick of malaria'].astype(float)
+# target y
+y_raw = pd.to_numeric(df['sick of malaria'], errors='coerce').fillna(0.0).astype(float)
 max_cases = y_raw.max() if y_raw.max() > 0 else 1.0
+# normalize y to 0-1
 y = (y_raw / max_cases).values.astype(np.float32)
 
-# Feature scaling
-feature_cols = ['temperature','rainfall','humidity','breedingCount','previousCases','irrigation','season']
+# create previous_cases column by shifting the raw target; fill first value with 0
+prev_cases = y_raw.shift(1).fillna(0.0)
+X['previous_cases'] = prev_cases.values
+
+feature_cols = ['temperature','humidity','rainy_days','previous_cases']
+
+# scale features using sklearn scaler
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X[feature_cols].values.astype(np.float32))
 
-# Save scaler
+# Save scaler and metadata (including feature order)
 with open('scaler.pkl', 'wb') as f:
     pickle.dump({'scaler': scaler, 'feature_cols': feature_cols, 'max_cases': max_cases}, f)
 

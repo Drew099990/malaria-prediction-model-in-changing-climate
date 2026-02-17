@@ -203,6 +203,7 @@
     --color-green-100: #dcfce7;
     --color-green-400: #05df72;
     --color-green-600: #00a544;
+    --color-green-700: #008138;
     --color-green-800: #016630;
     --color-blue-50: #eff6ff;
     --color-blue-100: #dbeafe;
@@ -217,6 +218,7 @@
     --color-purple-100: #f3e8ff;
     --color-slate-200: #e2e8f0;
     --color-slate-800: #1d293d;
+    --color-gray-50: #f9fafb;
     --color-gray-100: #f3f4f6;
     --color-gray-200: #e5e7eb;
     --color-black: #000;
@@ -281,6 +283,7 @@
       --color-green-100: color(display-p3 .885269 .984329 .910368);
       --color-green-400: color(display-p3 .399536 .862346 .49324);
       --color-green-600: color(display-p3 .243882 .640824 .294808);
+      --color-green-700: color(display-p3 .198355 .501799 .245335);
       --color-green-800: color(display-p3 .168568 .395123 .211217);
       --color-blue-50: color(display-p3 .941826 .963151 .995385);
       --color-blue-100: color(display-p3 .869214 .915931 .989622);
@@ -295,6 +298,7 @@
       --color-purple-100: color(display-p3 .945034 .910569 .992972);
       --color-slate-200: color(display-p3 .890322 .909405 .939294);
       --color-slate-800: color(display-p3 .121994 .158688 .232363);
+      --color-gray-50: color(display-p3 .977213 .98084 .985102);
       --color-gray-100: color(display-p3 .953567 .956796 .964321);
       --color-gray-200: color(display-p3 .899787 .906171 .92106);
     }
@@ -317,6 +321,7 @@
       --color-green-100: lab(96.186% -13.8464 6.52362);
       --color-green-400: lab(78.503% -64.9265 39.7492);
       --color-green-600: lab(59.0978% -58.6621 41.2579);
+      --color-green-700: lab(47.0329% -47.0239 31.4788);
       --color-green-800: lab(37.4616% -36.7971 22.9692);
       --color-blue-50: lab(96.492% -1.14647 -5.11479);
       --color-blue-100: lab(92.0301% -2.24757 -11.6453);
@@ -331,6 +336,7 @@
       --color-purple-100: lab(93.3333% 6.9744 -9.83434);
       --color-slate-200: lab(91.7353% -.998765 -4.76968);
       --color-slate-800: lab(16.132% -.318021 -14.6672);
+      --color-gray-50: lab(98.2596% -.247031 -.706708);
       --color-gray-100: lab(96.1596% -.082314 -1.13575);
       --color-gray-200: lab(91.6229% -.159085 -2.26791);
     }
@@ -689,6 +695,10 @@
     position: fixed;
   }
 
+  .relative {
+    position: relative;
+  }
+
   .sticky {
     position: -webkit-sticky;
     position: sticky;
@@ -835,6 +845,10 @@
     display: block;
   }
 
+  .contents {
+    display: contents;
+  }
+
   .flex {
     display: flex;
   }
@@ -871,6 +885,10 @@
 
   .h-\[38rem\] {
     height: 38rem;
+  }
+
+  .max-h-40 {
+    max-height: calc(var(--spacing) * 40);
   }
 
   .min-h-screen {
@@ -915,6 +933,10 @@
 
   .max-w-lg {
     max-width: var(--container-lg);
+  }
+
+  .border-collapse {
+    border-collapse: collapse;
   }
 
   .scale-91 {
@@ -1289,6 +1311,10 @@
     background-color: var(--color-green-100);
   }
 
+  .bg-green-600 {
+    background-color: var(--color-green-600);
+  }
+
   .bg-orange-100 {
     background-color: var(--color-orange-100);
   }
@@ -1363,6 +1389,10 @@
 
   .p-6 {
     padding: calc(var(--spacing) * 6);
+  }
+
+  .p-7 {
+    padding: calc(var(--spacing) * 7);
   }
 
   .p-8 {
@@ -1441,6 +1471,10 @@
     text-align: left;
   }
 
+  .text-right {
+    text-align: right;
+  }
+
   .font-mono {
     font-family: var(--font-geist-mono);
   }
@@ -1491,6 +1525,10 @@
   .text-xs {
     font-size: var(--text-xs);
     line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+
+  .text-\[0\.6rem\] {
+    font-size: .6rem;
   }
 
   .leading-7 {
@@ -1545,10 +1583,6 @@
 
   .text-balance {
     text-wrap: balance;
-  }
-
-  .whitespace-pre-wrap {
-    white-space: pre-wrap;
   }
 
   .text-background {
@@ -1860,6 +1894,10 @@
     animation: 2.7s type;
   }
 
+  .even\:bg-gray-50:nth-child(2n) {
+    background-color: var(--color-gray-50);
+  }
+
   @media (hover: hover) {
     .hover\:scale-105:hover {
       --tw-scale-x: 105%;
@@ -1896,6 +1934,12 @@
   @media (hover: hover) {
     .hover\:bg-blue-700:hover {
       background-color: var(--color-blue-700);
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:bg-green-700:hover {
+      background-color: var(--color-green-700);
     }
   }
 
