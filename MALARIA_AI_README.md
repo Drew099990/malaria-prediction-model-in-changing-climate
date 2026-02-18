@@ -78,10 +78,12 @@ The app will be available at `http://localhost:3000`
 
 1. Go to the **Forecast** page in the frontend.
 2. Provide the following inputs:
-   - **Temperature** (°C)
-   - **Humidity** (%)
-   - **Rainy Days** (count for the current month)
-   - **Previous Cases** (number of malaria cases reported last month)
+  - **Min Temperature** (°C)
+  - **Temperature (average)** (°C)
+  - **Max Temperature** (°C)
+  - **Humidity** (%)
+  - **Rainy Days** (count for the current month)
+  - **Previous Cases** (number of malaria cases reported last month)
 3. Click **"Compute Probability"**.
 4. The page will display:
    - Estimated outbreak probability (%)
@@ -91,11 +93,14 @@ The app will be available at `http://localhost:3000`
 
 ## Model Details
 
-The neural network is trained on four input features:
+
+The neural network is trained on six input features:
 
 | Feature | Description |
 |---------|-------------|
+| Min Temperature | Local minimum temperature (°C) |
 | Temperature | Average local temperature (°C) |
+| Max Temperature | Local maximum temperature (°C) |
 | Humidity | Relative humidity (%) |
 | Rainy Days | Number of rainy days in the current month |
 | Previous Cases | Reported malaria cases in the previous month |
@@ -113,9 +118,9 @@ The model returns a probability (0–100%) which is then mapped to:
 ### Neural Network Architecture
 
 ```
-Input (7 features)
+Input (6 features)
   ↓
-FC1: 7 → 64 (ReLU + Dropout)
+FC1: 6 → 64 (ReLU + Dropout)
   ↓
 FC2: 64 → 64 (ReLU + Dropout)
   ↓

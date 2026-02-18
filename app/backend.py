@@ -33,7 +33,9 @@ async def startup_event():
 
 # Define input schema for malaria prediction
 class MalariaInput(BaseModel):
+    min_temp: float = None  # °C
     temperature: float = None  # °C
+    max_temp: float = None  # °C
     humidity: float = None  # %
     rainy_days: int = None
     previous_cases: int = None  # cases last month
@@ -55,8 +57,12 @@ async def predict_malaria(input_data: MalariaInput):
         humidity = input_data.humidity or 50
         rainy = input_data.rainy_days or 0
         prev = input_data.previous_cases or 0
+        min_t = input_data.min_temp if input_data.min_temp is not None else temperature
+        max_t = input_data.max_temp if input_data.max_temp is not None else temperature
         result = predict_malaria_risk(
+            min_temp=min_t,
             temperature=temperature,
+            max_temp=max_t,
             humidity=humidity,
             rainy_days=rainy,
             previous_cases=prev,

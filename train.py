@@ -28,14 +28,16 @@ if 'sick of malaria' not in df.columns:
 # create it by shifting the target values (lag-1). users supplying live
 # values to the API will provide their own previousCases number.
 X = pd.DataFrame({
+    'min_temp': pd.to_numeric(df.get('min temp'), errors='coerce'),
     'temperature': pd.to_numeric(df.get('avg temp'), errors='coerce'),
+    'max_temp': pd.to_numeric(df.get('max temp'), errors='coerce'),
     'humidity': pd.to_numeric(df.get('humidity (%)'), errors='coerce'),
     'rainy_days': pd.to_numeric(df.get('rainy days'), errors='coerce'),
 })
 # placeholder for previous cases created later once y_raw is known
 
 # fill missing climate values with column median
-for c in ['temperature','humidity','rainy_days']:
+for c in ['min_temp','temperature','max_temp','humidity','rainy_days']:
     if X[c].isna().any():
         X[c] = X[c].fillna(X[c].median())
 
@@ -50,6 +52,8 @@ prev_cases = y_raw.shift(1).fillna(0.0)
 X['previous_cases'] = prev_cases.values
 
 feature_cols = ['temperature','humidity','rainy_days','previous_cases']
+# keep scaler feature order consistent with preprocess_input: min, avg, max, humidity, rainy_days, previous_cases
+feature_cols = ['min_temp','temperature','max_temp','humidity','rainy_days','previous_cases']
 
 # scale features using sklearn scaler
 scaler = StandardScaler()

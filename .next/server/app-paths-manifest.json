@@ -1,8 +1,6 @@
 {
-  "/(nav)/checker/page": "app/(nav)/checker/page.js",
   "/(nav)/forcast/page": "app/(nav)/forcast/page.js",
-  "/(nav)/tips/page": "app/(nav)/tips/page.js",
-  "/api/predict-batch/route": "app/api/predict-batch/route.js",
   "/api/predict/route": "app/api/predict/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/page": "app/page.js"
 }

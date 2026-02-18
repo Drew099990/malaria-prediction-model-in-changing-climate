@@ -9,13 +9,15 @@ class MalariaPredictor(nn.Module):
     PyTorch neural network for predicting malaria cases and risk percentage
     based on climate features and recent case history.
 
-    Input features (4):
-    - temperature (°C)
+    Input features (6):
+    - min_temp (°C)
+    - temperature (avg, °C)
+    - max_temp (°C)
     - humidity (%)
     - rainy_days (count)
     - previous_cases (number of cases last month)
     """
-    def __init__(self, input_size=4, hidden_size=64):
+    def __init__(self, input_size=6, hidden_size=64):
         super(MalariaPredictor, self).__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)
         self.relu1 = nn.ReLU()
@@ -63,7 +65,7 @@ def load_model(model_path="malaria_model.pth"):
             hidden_size = ckpt['fc1.weight'].shape[0]
             input_size = ckpt['fc1.weight'].shape[1]
         else:
-            input_size = 3
+            input_size = 6
             hidden_size = 64
         model = MalariaPredictor(input_size=int(input_size), hidden_size=int(hidden_size))
         model.load_state_dict(ckpt)
@@ -73,16 +75,13 @@ def load_model(model_path="malaria_model.pth"):
     return model
 
 
-def preprocess_input(temperature, humidity, rainy_days, previous_cases=0.0):
+def preprocess_input(min_temp, temperature, max_temp, humidity, rainy_days, previous_cases=0.0):
     """Prepare input tensor using the stored scaler if available.
 
-    This mirrors the preprocessing performed during training. If the
-    scaler file is missing the function falls back to a simple manual
-    normalization similar to the original implementation (with a very
-    rough scaling for previous_cases).
+    Order: min_temp, temperature (avg), max_temp, humidity, rainy_days, previous_cases
     """
     meta_path = Path(__file__).parent / 'scaler.pkl'
-    arr = np.array([temperature, humidity, rainy_days, previous_cases], dtype=np.float32)
+    arr = np.array([min_temp, temperature, max_temp, humidity, rainy_days, previous_cases], dtype=np.float32)
     arr = arr.reshape(1, -1)
     if meta_path.exists():
         try:
@@ -95,21 +94,23 @@ def preprocess_input(temperature, humidity, rainy_days, previous_cases=0.0):
             pass
     else:
         # fallback normalization if scaler not present
+        min_norm = (min_temp - 10) / 25  # rough 10-35°C
         temp_norm = (temperature - 15) / 20
+        max_norm = (max_temp - 20) / 20
         humidity_norm = (humidity - 30) / 60
         rainy_norm = min(rainy_days / 30, 1.0)
         prev_norm = min(previous_cases / 100.0, 1.0)
-        arr = np.array([temp_norm, humidity_norm, rainy_norm, prev_norm], dtype=np.float32).reshape(1, -1)
+        arr = np.array([min_norm, temp_norm, max_norm, humidity_norm, rainy_norm, prev_norm], dtype=np.float32).reshape(1, -1)
     return torch.tensor(arr, dtype=torch.float32)
 
 
-def predict_malaria_risk(temperature, humidity, rainy_days, previous_cases=0.0):
+def predict_malaria_risk(min_temp, temperature, max_temp, humidity, rainy_days, previous_cases=0.0):
     """Return both percentage risk and estimated case count.
 
     previous_cases - number of malaria cases reported in the previous month.
     """
     model = load_model()
-    input_tensor = preprocess_input(temperature, humidity, rainy_days, previous_cases)
+    input_tensor = preprocess_input(min_temp, temperature, max_temp, humidity, rainy_days, previous_cases)
     with torch.no_grad():
         output = model(input_tensor)
         prob = float(output.item()) * 100
@@ -154,5 +155,5 @@ def predict_malaria_risk(temperature, humidity, rainy_days, previous_cases=0.0):
 if __name__ == "__main__":
     create_and_save_model()
     # simple sanity check with zero previous cases
-    result = predict_malaria_risk(temperature=28, humidity=75, rainy_days=5, previous_cases=0)
+    result = predict_malaria_risk(min_temp=20, temperature=28, max_temp=33, humidity=75, rainy_days=5, previous_cases=0)
     print("Test prediction:", result)

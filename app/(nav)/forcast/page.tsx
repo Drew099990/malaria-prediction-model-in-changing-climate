@@ -5,6 +5,8 @@ import React, { useState } from "react";
 export default function ForcastPage() {
 
   const [temperature, setTemperature] = useState<number | "">("");
+  const [minTemp, setMinTemp] = useState<number | "">("");
+  const [maxTemp, setMaxTemp] = useState<number | "">("");
   const [humidity, setHumidity] = useState<number | "">("");
   const [rainyDays, setRainyDays] = useState<number | "">("");
   const [previousCases, setPreviousCases] = useState<number | "">("");
@@ -28,7 +30,9 @@ export default function ForcastPage() {
 
     try {
       const payload = {
+        min_temp: minTemp === "" ? null : minTemp,
         temperature: temperature === "" ? null : temperature,
+        max_temp: maxTemp === "" ? null : maxTemp,
         humidity: humidity === "" ? null : humidity,
         rainy_days: rainyDays === "" ? null : rainyDays,
         previous_cases: previousCases === "" ? null : previousCases,
@@ -87,6 +91,28 @@ export default function ForcastPage() {
                 onChange={(e) => setTemperature(e.target.value === "" ? "" : Number(e.target.value))}
               />
             </label>
+
+            <div className="flex gap-3">
+              <label className="block mb-3 w-1/2">
+                <div className="text-sm text-black/80">Min Temperature (°C)</div>
+                <input
+                  type="number"
+                  className="mt-1 w-full p-2 rounded border"
+                  value={minTemp}
+                  onChange={(e) => setMinTemp(e.target.value === "" ? "" : Number(e.target.value))}
+                />
+              </label>
+
+              <label className="block mb-3 w-1/2">
+                <div className="text-sm text-black/80">Max Temperature (°C)</div>
+                <input
+                  type="number"
+                  className="mt-1 w-full p-2 rounded border"
+                  value={maxTemp}
+                  onChange={(e) => setMaxTemp(e.target.value === "" ? "" : Number(e.target.value))}
+                />
+              </label>
+            </div>
 
             <label className="block mb-3">
               <div className="text-sm text-black/80">Number of Rainy Days</div>
